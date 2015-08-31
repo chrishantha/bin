@@ -1,0 +1,113 @@
+#!/bin/bash
+# Copyright 2015 M. Isuru Tharanga Chrishantha Perera
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# ----------------------------------------------------------------------------
+# A script for getting JFR Dumps
+# ----------------------------------------------------------------------------
+
+pid=""
+continuous=false
+sleep_time=15
+dump_dir=""
+jfrdump_name="recording"
+
+function help {
+    echo ""
+    echo "Usage: "
+    echo "jfrdump -p <java process id> -c -t <sleep time> -d <directory> -n <name>"
+    echo ""
+    echo "-p: Java Process ID, which has enabled JFR default recording"
+    echo "-c: If provided, jfrdump will get dumps continuously"
+    echo "-t: The sleep time"
+    echo "-d: The directory for the JFR dumps"
+    echo "-n: The name used for JFR dump file"
+    echo ""
+}
+
+function validatePid {
+    if ! [[ "$1" =~ ^[0-9]+$ ]]
+    then
+      echo "error: Invalid Process ID"
+      exit 1
+    fi
+}
+
+function validateSleepTime {
+    if ! [[ "$1" =~ ^[0-9]+[mhd]?$ ]]
+    then
+      echo "error: Invalid Sleep Time"
+      exit 1
+    fi
+}
+
+function jfrdump() {
+    now=`date +%Y_%m_%d_%H_%M_%S`
+    echo "$now: Getting a JFR dump from process $pid"
+    # Dump
+    jcmd $pid JFR.dump recording=0 filename="$jfrdump_name-$now.jfr"
+}
+
+while getopts "p::ct:d:" opts
+do
+  case $opts in
+    p)
+        validatePid ${OPTARG}
+        pid=${OPTARG}
+        ;;
+    c)
+        continuous=true
+        ;;
+    t)
+        validateSleepTime ${OPTARG} "Sleep Time"
+        sleep_time=${OPTARG}
+        ;;
+    d)
+        dump_dir=${OPTARG}
+        ;;
+    n)
+        jfrdump_name=${OPTARG}
+        ;;
+    \?)
+        help
+        exit 1
+        ;;
+  esac
+done
+
+if ! ps -p $pid > /dev/null 2>&1
+then
+    echo "The process $pid is not running. Cannot take a JFR dump"
+    exit 1
+fi
+
+if [[ -n $dump_dir && -d $dump_dir ]]
+then
+    jfrdump_name=$dump_dir/$jfrdump_name
+else
+    echo "Invalid Dump directory: $dump_dir"
+    exit 1
+fi
+
+if $continuous
+then
+    while ps -p $pid > /dev/null 2>&1
+    do
+        jfrdump
+        echo Sleeping: $sleep_time
+        sleep $sleep_time
+    done
+else
+    jfrdump
+fi
