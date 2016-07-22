@@ -16,6 +16,4 @@
 # ----------------------------------------------------------------------------
 # A script for searching text in pom.xml files
 # ----------------------------------------------------------------------------
-
-export GREP_OPTIONS='--color=auto'
-grep -i -R "$1" . --include=pom.xml
+grep -i -R "$1" . --include=pom.xml --color=always
