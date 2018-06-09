@@ -1,0 +1,29 @@
+#!/bin/bash
+project_dir="/home/isuru/work/git-projects/ballerina"
+ballerina_workspace_dir="/home/isuru/ballerina/workspace"
+mkdir -p ${ballerina_workspace_dir}
+cd ${ballerina_workspace_dir}
+echo "Remove existing distributions"
+for zip_file in ballerina-tools-*.zip; do
+    [ -f "${zip_file}" ] && mv -v "${zip_file}" /tmp
+done
+echo "Copying Distribution"
+cp -v ${project_dir}/distribution/zip/ballerina-tools/target/ballerina-tools-*.zip ${ballerina_workspace_dir}/
+ballerina_dist_name=""
+for zip_file in ballerina-tools-*.zip; do
+    [ -f "${zip_file}" ] && ballerina_dist_name="${zip_file}" && break
+done
+if [[ -z $ballerina_dist_name ]]; then
+	echo "Please check whether Ballerina distribution is in ${ballerina_workspace_dir}"
+	exit 1
+fi
+echo "Unzipping Distribution"
+unzip -q ${ballerina_dist_name}
+# Name without zip extension
+ballerina_dist_name="${ballerina_dist_name%.*}"
+rm -r ballerina-platform
+mv -v ${ballerina_dist_name} ballerina-platform
+echo "Copying MySQL Connector"
+cp -v ~/java/JDBC/MySQL-Connector/mysql-connector-java-5.1.46/mysql-connector-java-5.1.46.jar ballerina-platform/bre/lib
+echo "Export PATH (if needed)"
+echo export PATH=${ballerina_workspace_dir}/ballerina-platform/bin:\$PATH

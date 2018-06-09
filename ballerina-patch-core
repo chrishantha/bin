@@ -1,0 +1,6 @@
+#!/bin/bash -i
+project_dir="/home/isuru/work/git-projects/ballerina"
+ballerina_platform_dir="/home/isuru/ballerina/workspace/ballerina-platform"
+mcid -f ${project_dir}/bvm/ballerina-core/
+cp -v ${project_dir}/bvm/ballerina-core/target/ballerina-core-*.jar ${ballerina_platform_dir}/bre/lib
+echo "Done!"

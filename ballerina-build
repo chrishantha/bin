@@ -1,0 +1,6 @@
+#!/bin/bash -i
+project_dir="/home/isuru/work/git-projects/ballerina"
+cd ${project_dir}
+mcid -P ballerina
+mcid -f distribution/zip/ballerina-tools
+echo "Build Completed!"
