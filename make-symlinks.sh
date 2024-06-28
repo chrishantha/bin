@@ -1,9 +1,10 @@
 #!/bin/bash
 
 dirs=()
-dirs+=("/mnt/c/Users/isuper/Documents")
-dirs+=("/mnt/c/Users/isuper/Downloads")
-dirs+=("/mnt/c/Users/isuper/.m2")
+dirs+=("/mnt/c/Users/chris/Documents")
+dirs+=("/mnt/c/Users/chris/Downloads")
+dirs+=("/mnt/c/Users/chris/Dropbox")
+dirs+=("/mnt/c/Users/chris/.m2")
 dirs+=("/mnt/c/dev")
 dirs+=("/mnt/c/dev/projects")
 
